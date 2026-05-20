@@ -7,8 +7,14 @@ st.set_page_config(page_title="Tava & Dhe - Delivery App", page_icon="🍲", lay
 
 # Stilimi i aplikacionit me dizajn modern dhe ngjyra të ngrohta
 st.markdown("""
-    <style>
-    .main { background-color: #fcfaf7; }
+ ~~~~~~~~~~~^^^^
+        <style>
+        ^^^^^^^
+    ...<17 lines>...
+        </style>
+        ^^^^^^^^
+    """, unsafe_allow_index=True)
+    .main background-color: #fcfaf7; }
     h1, h2, h3 { color: #8B4513; font-family: 'Helvetica Neue', sans-serif; }
     .stButton>button { 
         background-color: #8B4513; 
