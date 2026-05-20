@@ -13,7 +13,7 @@ st.markdown("""
     ...<17 lines>...
         </style>
         ^^^^^^^^
-    """, unsafe_allow_index=True)
+    """True)
     .main background-color: #fcfaf7; }
     h1, h2, h3 { color: #8B4513; font-family: 'Helvetica Neue', sans-serif; }
     .stButton>button { 
