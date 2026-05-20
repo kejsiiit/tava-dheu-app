@@ -1,0 +1,127 @@
+import streamlit as st
+import time
+
+# 1. Konfigurimi i faqes - DUHET të jetë komanda e parë fare në Streamlit
+st.set_page_config(page_title="Tava & Dhe - Delivery App", page_icon="🍲", layout="centered")
+
+# 2. Rregullimi i parametrit të stilit (Nga unsafe_allow_index u bë unsafe_allow_html)
+st.markdown("""
+    <style>
+    .main { background-color: #fcfaf7; }
+    h1, h2, h3 { color: #8B4513; font-family: 'Helvetica Neue', sans-serif; }
+    .stButton>button { 
+        background-color: #8B4513; 
+        color: white; 
+        border-radius: 20px; 
+        border: none;
+        padding: 10px 24px;
+        width: 100%;
+    }
+    .stButton>button:hover { background-color: #A0522D; color: white; }
+    .box { 
+        background-color: #ffffff; 
+        padding: 20px; 
+        border-radius: 15px; 
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+        border-left: 5px solid #8B4513;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# Titulli kryesor i aplikacionit
+st.title("🍲 Tava & Dhe")
+st.subheader("Porosit Tavë Dheu autentike nga aplikacioni!")
+st.write("---")
+
+# Menaxhimi i faqeve brenda aplikacionit
+if 'page' not in st.session_state:
+    st.session_state.page = 'menu'
+if 'cart' not in st.session_state:
+    st.session_state.cart = {}
+
+# --- FAQJA 1: MENUJA ---
+if st.session_state.page == 'menu':
+    st.markdown("### 📋 Menuja Jonë Zyrtare")
+    
+    menu_items = {
+        "Tavë Dheu Tradicionale e Tiranës": {"përbërësit": "Mish viçi, gjizë fshati, hudhra, domate, erëza lokale", "çmimi": 650},
+        "Tavë Dheu me Mish Qengji": {"përbërësit": "Mish qengji i butë, salcë kosi, pjekur në furrë druri", "çmimi": 800},
+        "Tavë Dheu Vegjetariane": {"përbërësit": "Perime stine të pjekura, djathë kaçkavall i shkrirë", "çmimi": 500}
+    }
+    
+    for item, info in menu_items.items():
+        st.markdown(f"""
+        <div class="box">
+            <strong style="font-size: 18px; color: #8B4513;">{item}</strong><br>
+            <span style="color: #666; font-size: 14px;">{info['përbërësit']}</span><br>
+            <strong style="color: #A0522D;">Çmimi: {info['çmimi']} ALL</strong>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        if st.button(f"Shto në shportë: {item}", key=item):
+            st.session_state.cart[item] = st.session_state.cart.get(item, 0) + 1
+            st.toast(f"✅ {item} u shtua në shportë!")
+            
+    st.write("---")
+    
+    if st.session_state.cart:
+        st.markdown("### 🛒 Shporta Juaj Aktuale")
+        total = 0
+        for item, qty in st.session_state.cart.items():
+            subtotal = qty * menu_items[item]['çmimi']
+            total += subtotal
+            st.write(f"• *{item}* x{qty} — {subtotal} ALL")
+        
+        st.markdown(f"### Totali: {total} ALL")
+        
+        if st.button("Vazhdo te Pagesa & Delivery ➔"):
+            st.session_state.page = 'checkout'
+            st.rerun()
+
+# --- FAQJA 2: CHECKOUT ---
+elif st.session_state.page == 'checkout':
+    st.markdown("### 📍 Detajet e Dorëzimit")
+    
+    with st.form("delivery_form"):
+        emri = st.text_input("Emri dhe Mbiemri")
+        adresa = st.text_input("Adresa e saktë në Tiranë")
+        telefoni = st.text_input("Numri i Telefonit")
+        
+        metoda = st.radio("Mënyra e pagesës:", ('Kesh në dorë (Cash)', 'Kartë Krediti (In-App)'))
+        
+        submit = st.form_submit_button("Konfirmo Porosinë 🚀")
+        
+        if submit:
+            if not emri or not adresa or not telefoni:
+                st.error("Ju lutem plotësoni të gjitha të dhënat!")
+            else:
+                st.session_state.page = 'tracking'
+                st.rerun()
+
+# --- FAQJA 3: LIVE TRACKING ---
+elif st.session_state.page == 'tracking':
+    st.markdown("### 🛵 Ndjekja e Porosisë në Kohë Reale")
+    st.success("Porosia u pranua! Furra po ndizet...")
+    
+    progress_bar = st.progress(0)
+    status_text = st.empty()
+    
+    hapat = [
+        {"përparimi": 25, "mesazhi": "👨‍🍳 Kuzhina po përgatit enën tuaj të dheut..."},
+        {"përparimi": 50, "mesazhi": "🔥 Tava po piqet në furrë dhe po bëhet gati..."},
+        {"përparimi": 75, "mesazhi": "🛵 Korrieri elektrik u nis me çantën termike drejt jush..."},
+        {"përparimi": 100, "mesazhi": "🎉 Korrieri mbërriti te dera! Ju bëftë mirë! 🍲"}
+    ]
+    
+    for hap in hapat:
+        status_text.markdown(f"*Statusi:* {hap['mesazhi']}")
+        progress_bar.progress(hap['përparimi'])
+        time.sleep(2)
+        
+    st.balloons()
+    
+    if st.button("Bëj një porosi të re"):
+        st.session_state.cart = {}
+        st.session_state.page = 'menu'
+        st.rerun()
