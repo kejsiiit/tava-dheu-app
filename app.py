@@ -20,6 +20,7 @@ st.markdown("""
         background-color: #8B4513; 
         color: white; 
         border-radius: 20px; 
+        ^
         border: none;
         padding: 10px 24px;
     }
